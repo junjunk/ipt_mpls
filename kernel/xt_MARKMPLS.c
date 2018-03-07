@@ -81,6 +81,10 @@ markmpls_tg(struct sk_buff *skb, const struct xt_action_param *par)
 
 static int markmpls_tg_check(const struct xt_tgchk_param *par)
 {
+	if ((par->hook_mask & ~(1 << NF_INET_POST_ROUTING)) != 0) {
+		pr_info("Only possible after route decision\n");
+		return -EINVAL;
+	}		
 	return 0;
 }
 
@@ -89,7 +93,6 @@ static struct xt_target markmpls_tg_reg[] __read_mostly = {
 		.name       = "MARKMPLS",
 		.revision   = 0,
 		.family     = NFPROTO_IPV4,
-		.hooks      = NF_INET_POST_ROUTING,
 		.target     = markmpls_tg,
 		.targetsize = 0,
 		.table      = "mangle",
@@ -100,7 +103,6 @@ static struct xt_target markmpls_tg_reg[] __read_mostly = {
 		.name       = "MARKMPLS",
 		.revision   = 0,
 		.family     = NFPROTO_IPV6,
-		.hooks      = NF_INET_POST_ROUTING,
 		.target     = markmpls_tg,
 		.targetsize = 0,
 		.table      = "mangle",
